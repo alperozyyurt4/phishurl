@@ -1,0 +1,10 @@
+Cross-validation Accuracy Scores: [0.9510312676429749, 0.9521562457084656, 0.9519062638282776, 0.953374981880188, 0.9546874761581421]
+Mean CV Accuracy: 0.9526
+CV Training Time: 35915.30 seconds
+Final Training Time: 8666.24 seconds
+Test Set Accuracy: 0.9514
+Precision: 0.9514
+Recall: 0.9514
+F1 Score: 0.9513
+AUC Score: 0.9909
+Test Time: 39.24 seconds

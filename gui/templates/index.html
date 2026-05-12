@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>URL Güvenlik Tahmini</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .main-container {
+        max-width: 1200px;
+        margin: auto;
+        padding-top: 30px;
+    }
+    .card {
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+    .scroll-box {
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 14px;
+    }
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+        font-size: 13px;
+    }
+    .alert {
+        font-size: 15px;
+        padding: 10px;
+    }
+    h5, h6 {
+        font-weight: 600;
+    }
+    .copy-btn {
+        font-size: 12px;
+        margin-left: 5px;
+        padding: 2px 6px;
+        border: none;
+        border-radius: 4px;
+        background-color: #e0e0e0;
+        cursor: pointer;
+    }
+    .sort-icon {
+        font-size: 12px;
+        margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="row g-4">
+    <!-- SOL Panel -->
+    <div class="col-lg-4">
+      <div class="card p-4 bg-white">
+        <h5 class="mb-3">🔍 Şüpheli URL Analizi</h5>
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label d-flex justify-content-between align-items-center">
+              🌐 URL Girin:
+              <button type="button" class="copy-btn" onclick="pasteFromClipboard()">📋 Yapıştır</button>
+            </label>
+            <input type="text" class="form-control form-control-sm" name="url" id="urlInput" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">🧠 Model Seçin:</label>
+            <select class="form-select form-select-sm" name="model" required>
+              {% for model in models %}
+                <option value="{{ model }}" {% if selected_model == model %}selected{% endif %}>{{ model }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">🚀 Tahmin Yap</button>
+        </form>
+      </div>
+
+      {% if prediction_result is not none %}
+      <div class="card p-4 bg-white">
+        <h6 class="mb-3">📢 Tahmin Sonucu</h6>
+        <div class="alert {% if prediction_result == 1 %}alert-danger{% else %}alert-success{% endif %}" role="alert">
+          <strong>
+            {% if prediction_result == 1 %}
+              💣 TEHLİKELİ (1)
+            {% else %}
+              ✅ GÜVENLİ (0)
+            {% endif %}
+          </strong>
+        </div>
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item">⏱️ Özellik çıkarımı: <strong>{{ (times.extract_time * 1000) | round(1) }} ms</strong></li>
+          <li class="list-group-item">📦 Model yükleme: <strong>{{ times.load_time | round(3) }} s</strong></li>
+          <li class="list-group-item">⚙️ Tahmin süresi: <strong>{{ (times.predict_time * 1000) | round(1) }} ms</strong></li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- SAĞ Panel -->
+    <div class="col-lg-8">
+      {% if features_table is not none %}
+      <div class="card p-4 bg-white">
+        <h6 class="mb-3">📊 Çıkarılan Feature'lar</h6>
+        <div class="scroll-box">
+          <table class="table table-bordered table-sm table-striped" id="featureTable">
+            <thead class="table-light">
+              <tr>
+                <th onclick="sortTable(0, this)">Feature</th>
+                <th onclick="sortTable(1, this)">Değer</th>
+                <th onclick="sortTable(2, this)">Süre (ms)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in features_table.values %}
+              <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ (row[2] * 1000) | round(2) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+  function pasteFromClipboard() {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText()
+        .then(text => {
+          document.getElementById("urlInput").value = text;
+        })
+        .catch(err => {
+          alert("Panoya erişilemedi: " + err);
+        });
+    } else {
+      alert("Tarayıcınız panoya erişimi desteklemiyor.");
+    }
+  }
+
+  function sortTable(colIndex, thElement) {
+    const table = document.getElementById("featureTable");
+    const rows = Array.from(table.rows).slice(1);
+    const currentSort = thElement.getAttribute("data-sort") || "desc";
+    const newSort = currentSort === "asc" ? "desc" : "asc";
+
+    rows.sort((a, b) => {
+      const aText = a.cells[colIndex].innerText;
+      const bText = b.cells[colIndex].innerText;
+      const aVal = parseFloat(aText) || aText.toLowerCase();
+      const bVal = parseFloat(bText) || bText.toLowerCase();
+      return newSort === "asc" ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+    });
+
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+
+    // İkonları sıfırla
+    const allTh = table.querySelectorAll("th");
+    allTh.forEach(th => {
+      th.removeAttribute("data-sort");
+      const icon = th.querySelector(".sort-icon");
+      if (icon) icon.remove();
+    });
+
+    // Yeni ikon ekle
+    thElement.setAttribute("data-sort", newSort);
+    const iconSpan = document.createElement("span");
+    iconSpan.classList.add("sort-icon");
+    iconSpan.textContent = newSort === "asc" ? " 🔼" : " 🔽";
+    thElement.appendChild(iconSpan);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Large local datasets
+datasets.zip
+feature_extract/4M_dataset_last_extracted_features.csv
+feature_extract/*.csv
+
+# Jupyter / local files
+.ipynb_checkpoints/
+
