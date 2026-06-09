@@ -49,7 +49,6 @@ phishurl/
 ├── feature_extract/
 │   ├── phishurl_feacture_extract.py
 │   ├── tldlist.txt
-│   └── 4M_dataset_last_extracted_features.csv
 ├── gui/
 │   ├── app.py
 │   ├── feature_extraction.py
@@ -76,7 +75,15 @@ phishurl/
 │   ├── logisticregression.py
 │   ├── ltsmcode.py
 │   └── randomforest.py
-├── datasets.zip
+├── huggingface/
+│   ├── dataset-card/
+│   ├── model-card/
+│   ├── space/
+│   ├── space-card/
+│   ├── prepare_dataset.py
+│   └── README.md
+├── LICENSE
+├── requirements-pip.txt
 ├── requirements.txt
 └── README.md
 ```
@@ -85,18 +92,36 @@ phishurl/
 
 ## Dataset | Veri Seti
 
-Large dataset files are not included directly in this repository because they exceed GitHub's file size limit.
+Large dataset files are not included directly in this GitHub repository because they exceed GitHub's file size limit.
 
 Büyük veri dosyaları GitHub dosya boyutu limitini aştığı için repository içine doğrudan eklenmemiştir.
 
-| File | Link |
+The prepared dataset is published separately on Hugging Face:
+
+| Resource | Link |
 |---|---|
-| `datasets.zip` | [Google Drive folder](https://drive.google.com/drive/folders/1psaEZ4OS-pbuVQrEErKLm5prFuLb_pWU?usp=sharing) |
-| `feature_extract/4M_dataset_last_extracted_features.csv` | [Google Drive file](https://drive.google.com/file/d/1OEI-7I0oQi4X71ATP0744XyHs9tzwjVD/view?usp=sharing) |
+| Hugging Face Dataset | [alperozyyurt/phishurl-dataset](https://huggingface.co/datasets/alperozyyurt/phishurl-dataset) |
+| Hugging Face Model Repo | [alperozyyurt/phishurl-detection](https://huggingface.co/alperozyyurt/phishurl-detection) |
+| Hugging Face Demo Space | [alperozyyurt/phishurl-detection-demo](https://huggingface.co/spaces/alperozyyurt/phishurl-detection-demo) |
 
-After downloading, place the files in the same paths shown above if you want to run training scripts locally.
+The Hugging Face dataset is stored as Parquet splits:
 
-İndirdikten sonra eğitim scriptlerini yerelde çalıştırmak için dosyaları tabloda gösterilen aynı yollara yerleştirin.
+- `train.parquet`
+- `validation.parquet`
+- `test.parquet`
+
+To recreate those files from the local extracted-feature CSV, use:
+
+```bash
+python huggingface/prepare_dataset.py \
+  --input "4M Dataset Features.csv" \
+  --output-dir hf_dataset \
+  --label-column label
+```
+
+The local CSV and generated `hf_dataset/` folder are intentionally ignored by Git.
+
+Yerel CSV dosyası ve üretilen `hf_dataset/` klasörü bilinçli olarak Git dışında tutulur.
 
 ---
 
@@ -256,6 +281,10 @@ EN: This project is intended for academic/experimental phishing URL detection. I
 
 ## License | Lisans
 
-No license file is currently included in this repository. Add a license before public distribution if needed.
+This repository is released under the MIT License. See [`LICENSE`](LICENSE).
 
-Bu repository içinde henüz bir lisans dosyası bulunmamaktadır. Herkese açık kullanım veya dağıtım için lisans eklenmesi önerilir.
+Bu repository MIT lisansı ile yayınlanmıştır. Detaylar için [`LICENSE`](LICENSE) dosyasına bakın.
+
+Dataset redistribution rights should be verified separately before publishing the full dataset.
+
+Veri setinin tamamını yayınlamadan önce kullanılan veri kaynaklarının yeniden dağıtım izinleri ayrıca doğrulanmalıdır.

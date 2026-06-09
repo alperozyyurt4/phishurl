@@ -1,0 +1,11 @@
+gradio==5.0.0
+huggingface_hub==0.25.2
+numpy==1.23.5
+pandas==2.2.3
+scikit-learn==1.6.0
+joblib==1.4.2
+tldextract==5.1.2
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.25.1
+lightgbm==4.5.0
+xgboost==2.1.4

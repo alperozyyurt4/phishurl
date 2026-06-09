@@ -13,9 +13,10 @@ env/
 
 # Large local datasets
 datasets.zip
+4M Dataset Features.csv
+hf_dataset/
 feature_extract/4M_dataset_last_extracted_features.csv
 feature_extract/*.csv
 
 # Jupyter / local files
 .ipynb_checkpoints/
-

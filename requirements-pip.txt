@@ -1,0 +1,16 @@
+flask>=3.0
+flask-cors>=5.0
+numpy>=1.23,<2.0
+pandas>=2.0
+scikit-learn>=1.6
+tensorflow>=2.12
+keras>=2.12
+joblib>=1.4
+matplotlib>=3.8
+seaborn>=0.13
+tldextract>=5.0
+fuzzywuzzy>=0.18
+requests>=2.32
+beautifulsoup4>=4.12
+lightgbm>=4.0
+xgboost>=2.0
